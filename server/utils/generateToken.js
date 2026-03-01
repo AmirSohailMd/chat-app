@@ -7,5 +7,5 @@ const generateToken = (id) =>{
         { expiresIn : "30d"}
     );
 };
-
+//console.log("Signing with:", process.env.JWT_SECRET);
 module.exports = generateToken;
