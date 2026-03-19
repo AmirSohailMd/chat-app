@@ -60,7 +60,7 @@ const fetchChats = async (req, res) => {
 
     const populatedChats = await User.populate(chats, {
       path: "latestMessage.sender",
-      selet: "name email",
+      select: "name email",
     });
 
     res.status(200).send(populatedChats);

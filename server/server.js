@@ -2,11 +2,23 @@ require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server,{
+  pingTimeout: 60000,
+  cors:{
+    origin: "*",
+  },
+});
 
 app.use(express.json());
 app.use("/api/users", userRoutes);

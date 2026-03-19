@@ -5,7 +5,7 @@ const sendMessage = async (req, res) => {
   const { content, chatId, messageId } = req.body;
 
   if (!content || !chatId) {
-    return res.statu(400).json({ message: "Invalid data passed" });
+    return res.status(400).json({ message: "Invalid data passed" });
   }
 
   try {
@@ -23,7 +23,7 @@ const sendMessage = async (req, res) => {
     message = await message.populate("chat.users", "name email");
 
     await Chat.findByIdAndUpdate(chatId, {
-      latestMessage: message,
+      latestMessage: message._id,
     });
 
     res.json(message);
@@ -32,4 +32,17 @@ const sendMessage = async (req, res) => {
   }
 };
 
-module.exports = { sendMessage };
+const fetchMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .populate("sender", "name email")
+      .populate("chat", "_id users")
+      .sort({ createdAt: 1 });
+
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { sendMessage, fetchMessages };
