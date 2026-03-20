@@ -1,5 +1,5 @@
 require("dotenv").config();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 const express = require("express");
 const http = require("http");
@@ -16,15 +16,28 @@ const server = http.createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
+
+const cors = require("cors");
+
+app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
 
 io.on("connection", (socket) => {
   console.log("User connected: ", socket.id);
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);
+    socket.emit("connected");
     console.log("User joined room: ", userData._id);
   });
 
@@ -36,25 +49,52 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
+  // socket.on("new message", (newMessageReceived) => {
+  //   let chat = newMessageReceived.chat;
+
+  //   if (!chat.users) return;
+
+  //   chat.users.forEach((user) => {
+  //     const userId = user._id ? user._id.toString() : user.toString();
+
+  //     if (userId === newMessageReceived.sender._id.toString()) return;
+
+  //     console.log("Sending message to:", userId); // DEBUG
+
+  //     socket.to(userId).emit("message received", newMessageReceived);
+  //   });
+  // });
+
   socket.on("new message", (newMessageReceived) => {
+    console.log("🔥 NEW MESSAGE EVENT RECEIVED");
     let chat = newMessageReceived.chat;
 
-    if (!chat.users) return;
+    if (!chat || !chat.users) return console.log("Chat users not defined");
 
     chat.users.forEach((user) => {
-      if (user == newMessageReceived.sender._id) return;
+      const userId = user._id ? user._id.toString() : user.toString();
 
-      socket.in(user).emnit("message received", newMessageReceived);
+      // Ensure sender exists before checking ID
+      const senderId = newMessageReceived.sender?._id?.toString();
+
+      if (userId === senderId) return;
+
+      console.log("📤 Emitting to user:", userId);
+
+      //socket.to(userId).emit("message received", newMessageReceived);
+
+      socket
+        .to(chat._id.toString())
+        .emit("message received", newMessageReceived);
     });
   });
 
-  socket.off("setup", () => {
-    console.log("User Disconnected");
-    socket.leave(userData._id);
-  });
+  // socket.off("setup", () => {
+  //   console.log("User Disconnected");
+  //   socket.leave(userData._id);
+  // });
 });
 
-app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
