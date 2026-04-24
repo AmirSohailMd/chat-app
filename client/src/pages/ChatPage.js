@@ -12,7 +12,7 @@ function ChatPage() {
   const bottomRef = useRef();
   const chatId = "69ad582139d47e9a3542b7a6"; // your chat id
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTJjZTM1Njk0ZjBlZDg0MGRiNjdhZiIsImlhdCI6MTc3MjM3OTIyNiwiZXhwIjoxNzc0OTcxMjI2fQ.DwJnkgWSfE_wwXY3y_LXKQ2K3FNre1Pp5iLhOAMyeBc";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWI3YmYzMDg1ZGY4MWJiMWYwYTVjMiIsImlhdCI6MTc3NzA1MDUwNSwiZXhwIjoxNzc5NjQyNTA1fQ.HHkCHTi7ihuLrKT5ykbcXQMsbI6PNM_ZbASHfWCMWII";
 
   const inputRef = useRef();
   const [typing, setTyping] = useState(false);
@@ -52,16 +52,19 @@ function ChatPage() {
           : newMessageReceived.chat;
 
       if (chatId !== incomingChatId) return;
-      setMessages((prev) => [...prev, newMessageReceived]);
+      setMessages((prev) => {
+        if (prev.find((m) => m._id === newMessageReceived._id)) return prev; // ✅ prevent duplicates
+        return [...prev, newMessageReceived];
+      });
     };
 
     socket.on("message received", handleMessage);
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
 
-    socket.on("message received", (msg) => {
-      console.log("Incoming socket message:", msg);
-    });
+    // socket.on("message received", (msg) => {
+    //   console.log("Incoming socket message:", msg);
+    //});
 
     return () => {
       socket.off("message received", handleMessage);
@@ -119,17 +122,17 @@ function ChatPage() {
           <div
             key={msg._id}
             className={`flex ${
-              msg.sender._id === user?._id ? "justify-end" : "justify-start"
+              msg.sender?._id === user?._id ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`p-3 rounded-lg max-w-xs ${
-                msg.sender._id === user?._id
+                msg.sender?._id === user?._id
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200"
               }`}
             >
-              <p className="text-xs opacity-70 mb-1">{msg.sender.name}</p>
+              <p className="text-xs opacity-70 mb-1">{msg.sender?.name}</p>
               <p>{msg.content}</p>
             </div>
           </div>

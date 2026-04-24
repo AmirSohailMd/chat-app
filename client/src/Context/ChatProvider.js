@@ -13,7 +13,7 @@ const ChatProvider = ({ children }) => {
   useEffect(() => {
     // TEMP user (replace later with login)
     const loggedUser = {
-      _id: "69a2ce35694f0ed840db67af",
+      _id: "69eb7bf3085df81bb1f0a5c2",
       name: "Sam",
     };
 

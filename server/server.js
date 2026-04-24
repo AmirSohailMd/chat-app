@@ -65,28 +65,42 @@ io.on("connection", (socket) => {
   //   });
   // });
 
+  // socket.on("new message", (newMessageReceived) => {
+  //   console.log("🔥 NEW MESSAGE EVENT RECEIVED");
+  //   let chat = newMessageReceived.chat;
+
+  //   if (!chat || !chat.users) return console.log("Chat users not defined");
+
+  //   chat.users.forEach((user) => {
+  //     const userId = user._id ? user._id.toString() : user.toString();
+
+  //     // Ensure sender exists before checking ID
+  //     const senderId = newMessageReceived.sender?._id?.toString();
+
+  //     if (userId === senderId) return;
+
+  //     console.log("📤 Emitting to user:", userId);
+
+  //     //socket.to(userId).emit("message received", newMessageReceived);
+
+  //     socket
+  //       .to(chat._id.toString())
+  //       .emit("message received", newMessageReceived);
+  //   });
+  // });
+
   socket.on("new message", (newMessageReceived) => {
     console.log("🔥 NEW MESSAGE EVENT RECEIVED");
+
     let chat = newMessageReceived.chat;
 
-    if (!chat || !chat.users) return console.log("Chat users not defined");
+    if (!chat || !chat._id) {
+      return console.log("❌ Chat not defined");
+    }
 
-    chat.users.forEach((user) => {
-      const userId = user._id ? user._id.toString() : user.toString();
+    console.log("📤 Emitting to chat room:", chat._id.toString());
 
-      // Ensure sender exists before checking ID
-      const senderId = newMessageReceived.sender?._id?.toString();
-
-      if (userId === senderId) return;
-
-      console.log("📤 Emitting to user:", userId);
-
-      //socket.to(userId).emit("message received", newMessageReceived);
-
-      socket
-        .to(chat._id.toString())
-        .emit("message received", newMessageReceived);
-    });
+    socket.to(chat._id.toString()).emit("message received", newMessageReceived);
   });
 
   // socket.off("setup", () => {
