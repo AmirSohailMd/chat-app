@@ -10,9 +10,9 @@ function ChatPage() {
   const [newMessage, setNewMessage] = useState("");
 
   const bottomRef = useRef();
-  const chatId = "69ad582139d47e9a3542b7a6"; // your chat id
+  const chatId = "6a928e154122e6fddf6006ec"; // your chat id, the chat room ID where the users join.
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWI3YmYzMDg1ZGY4MWJiMWYwYTVjMiIsImlhdCI6MTc3NzA1MDUwNSwiZXhwIjoxNzc5NjQyNTA1fQ.HHkCHTi7ihuLrKT5ykbcXQMsbI6PNM_ZbASHfWCMWII";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTI4YjM5NDEyMmU2ZmRkZjYwMDZlMiIsImlhdCI6MTc4Nzk4OTE1NiwiZXhwIjoxNzkwNTgxMTU2fQ.m0VrduvRaKtHdrPy9-EOcXTaxhbHE5cGje6ycg2hSws";
 
   const inputRef = useRef();
   const [typing, setTyping] = useState(false);
