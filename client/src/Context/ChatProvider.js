@@ -11,30 +11,43 @@ const ChatProvider = ({ children }) => {
   const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
-    // TEMP user (replace later with login)
-    const loggedUser = {
-      _id: "6a928b394122e6fddf6006e2",
-      name: "Sam",
-    };
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUser(userInfo);
+  }, []);
 
-    setUser(loggedUser);
-
+  useEffect(() => {
+    if (!user) {
+      setSocket((prevSocket) => {
+        if (prevSocket) prevSocket.disconnect();
+        return null;
+      });
+      setSocketConnected(false);
+      return;
+    }
     const newSocket = io(ENDPOINT);
-
-    newSocket.emit("setup", loggedUser);
+    newSocket.emit("setup", user);
 
     newSocket.on("connected", () => {
-      console.log("Socket connected");
+      console.log("Socket connected for", user.name);
       setSocketConnected(true);
     });
 
     setSocket(newSocket);
 
-    return () => newSocket.disconnect();
-  }, []);
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [user]);
+
+  const logout = () => {
+    localStorage.removeItem("userInfo");
+    setUser(null);
+  };
 
   return (
-    <ChatContext.Provider value={{ user, socket, socketConnected }}>
+    <ChatContext.Provider
+      value={{ user, setUser, socket, socketConnected, logout }}
+    >
       {children}
     </ChatContext.Provider>
   );
@@ -45,5 +58,3 @@ export const ChatState = () => {
 };
 
 export default ChatProvider;
-
-

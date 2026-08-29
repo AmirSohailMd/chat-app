@@ -2,17 +2,20 @@ import React, { useEffect, useState, useRef } from "react";
 //import { connectSocket, getSocket } from "../socket";
 import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ChatPage() {
   //const [user, setUser] = useState(null);
-  const { socket, socketConnected, user } = ChatState();
+  const { socket, socketConnected, user, logout } = ChatState();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
   const bottomRef = useRef();
   const chatId = "6a928e154122e6fddf6006ec"; // your chat id, the chat room ID where the users join.
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTI4YjM5NDEyMmU2ZmRkZjYwMDZlMiIsImlhdCI6MTc4Nzk4OTE1NiwiZXhwIjoxNzkwNTgxMTU2fQ.m0VrduvRaKtHdrPy9-EOcXTaxhbHE5cGje6ycg2hSws";
+  // const token =
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTI4YjM5NDEyMmU2ZmRkZjYwMDZlMiIsImlhdCI6MTc4Nzk4OTE1NiwiZXhwIjoxNzkwNTgxMTU2fQ.m0VrduvRaKtHdrPy9-EOcXTaxhbHE5cGje6ycg2hSws";
+  const token = user?.token;
 
   const inputRef = useRef();
   const [typing, setTyping] = useState(false);
@@ -38,7 +41,7 @@ function ChatPage() {
     };
 
     fetchMessages();
-  }, [socketConnected, socket, user, chatId]); // Triggers only when connection is confirmed
+  }, [socketConnected, socket, user, chatId, token]); // Triggers only when connection is confirmed
 
   useEffect(() => {
     if (!socket) return;
@@ -82,6 +85,13 @@ function ChatPage() {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (!userInfo) {
+      navigate("/");
+    }
+  }, [navigate, user]);
+
   // Send message
   const sendMessage = async () => {
     if (!newMessage) return;
@@ -116,7 +126,45 @@ function ChatPage() {
 
   return (
     <div className="h-screen flex flex-col max-w-xl mx-auto border shadow-lg p-4">
-      {/* Messages */}
+      {/* 1. TOP HEADER & LOGOUT */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "12px",
+          paddingBottom: "8px",
+          borderBottom: "1px solid #e2e8f0",
+        }}
+      >
+        <div>
+          <span style={{ color: "#10b981", marginRight: "6px" }}>●</span>
+          <strong>{user?.name}</strong>{" "}
+          <span style={{ fontSize: "12px", color: "#64748b" }}>
+            ({user?.email})
+          </span>
+        </div>
+
+        <button
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
+          style={{
+            background: "#fee2e2",
+            color: "#dc2626",
+            border: "none",
+            padding: "6px 12px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* 2. MESSAGES LIST */}
       <div className="flex-1 overflow-y-auto space-y-3 p-2">
         {messages.map((msg) => (
           <div
@@ -140,7 +188,7 @@ function ChatPage() {
         <div ref={bottomRef}></div>
       </div>
 
-      {/* Input */}
+      {/* 3. INPUT AREA */}
       {isTyping && <div className="text-sm text-gray-500 px-2">Typing...</div>}
       <div className="mt-2 flex gap-2 border-t pt-2">
         <input
@@ -150,19 +198,14 @@ function ChatPage() {
           value={newMessage}
           onChange={(e) => {
             setNewMessage(e.target.value);
-
-            //const socket = getSocket();
             if (!socket) return;
-
             if (!typing) {
               setTyping(true);
               socket.emit("typing", chatId);
             }
-
             if (typingTimeoutRef.current) {
               clearTimeout(typingTimeoutRef.current);
             }
-
             typingTimeoutRef.current = setTimeout(() => {
               socket.emit("stop typing", chatId);
               setTyping(false);
