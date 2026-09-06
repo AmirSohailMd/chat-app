@@ -1,8 +1,9 @@
 // client/src/Context/ChatProvider.js
 import { io } from "socket.io-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { SOCKET_URL } from "../config";
 
-const ENDPOINT = "http://localhost:8000";
+//const ENDPOINT = "API_URL";
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
@@ -27,8 +28,11 @@ const ChatProvider = ({ children }) => {
       setSocketConnected(false);
       return;
     }
-    const newSocket = io(ENDPOINT);
-    newSocket.emit("setup", user);
+    const newSocket = io(SOCKET_URL, {
+      auth: {
+        token: user.token,
+      },
+    });
 
     newSocket.on("connected", () => {
       console.log("Socket connected for", user.name);

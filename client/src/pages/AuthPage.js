@@ -1,5 +1,6 @@
 //1.Imports
 import React, { useState, useEffect, useRef } from "react";
+import { API_URL } from "../config";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ChatState } from "../Context/ChatProvider";
@@ -65,7 +66,7 @@ function Authpage() {
       };
 
       const { data } = await axios.post(
-        "http://localhost:8000/api/users/login",
+        `${API_URL}/api/users/login`,
         { email, password },
         config,
       );
@@ -109,7 +110,7 @@ function Authpage() {
       };
 
       const { data } = await axios.post(
-        "http://localhost:8000/api/users/register",
+        `${API_URL}/api/users/register`,
         { name, email, password },
         config,
       );

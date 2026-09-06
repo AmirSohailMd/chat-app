@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-//console.log("JWT_SECRET:", process.env.JWT_SECRET);
 const protect = async (req, res, next) => {
   let token;
 

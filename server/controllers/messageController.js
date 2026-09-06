@@ -16,6 +16,17 @@ const sendMessage = async (req, res) => {
       messageId,
     };
 
+    const chat = await Chat.findOne({
+      _id: chatId,
+      users: req.user._id,
+    });
+
+    if (!chat) {
+      return res.status(403).json({
+        message: "You are not authorized to send messages in this chat",
+      });
+    }
+
     let message = await Message.create(newMessage);
 
     message = await message.populate("sender", "name email");
@@ -40,11 +51,9 @@ const fetchMessages = async (req, res) => {
     });
 
     if (!chat) {
-      return res
-        .status(403)
-        .json({
-          message: "You are not authorized to view messages in this chat",
-        });
+      return res.status(403).json({
+        message: "You are not authorized to view messages in this chat",
+      });
     }
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "name email")

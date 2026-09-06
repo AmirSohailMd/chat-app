@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
 import { UNSAFE_AwaitContextProvider, useNavigate } from "react-router-dom";
+import { API_URL } from "../config";
 
 function ChatPage() {
   //const [user, setUser] = useState(null);
@@ -43,27 +44,6 @@ function ChatPage() {
   const isUserOnline = (userId) => {
     return onLineUsers?.includes(userId);
   };
-
-  // useEffect(() => {
-  //   // Wait for the provider to signal that the socket is ready
-  //   if (!socketConnected || !socket || !user) return;
-
-  //   socket.emit("join chat", chatId);
-
-  //   const fetchMessages = async () => {
-  //     try {
-  //       const { data } = await axios.get(
-  //         `http://localhost:8000/api/message/${chatId}`,
-  //         { headers: { Authorization: `Bearer ${token}` } },
-  //       );
-  //       setMessages(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch messages", error);
-  //     }
-  //   };
-
-  //   fetchMessages();
-  // }, [socketConnected, socket, user, chatId, token]); // Triggers only when connection is confirmed
 
   useEffect(() => {
     if (!socket) return;
@@ -126,10 +106,9 @@ function ChatPage() {
 
     try {
       setLoadingSearch(true);
-      const { data } = await axios.get(
-        `http://localhost:8000/api/users?search=${query}`,
-        { headers: { Authorization: `Bearer ${user.token}` } },
-      );
+      const { data } = await axios.get(`${API_URL}/api/users?search=${query}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
 
       setSearchResults(data);
     } catch (error) {
@@ -143,7 +122,7 @@ function ChatPage() {
   const accessChat = async (userId) => {
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/api/chat",
+        `${API_URL}/api/chat`,
         { userId },
         { headers: { Authorization: `Bearer ${user.token}` } },
       );
@@ -165,7 +144,7 @@ function ChatPage() {
 
   const fetchChats = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8000/api/chat", {
+      const { data } = await axios.get(`${API_URL}/api/chat`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setChats(data);
@@ -193,7 +172,7 @@ function ChatPage() {
     const fetchMessages = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:8000/api/message/${selectedChat._id}`,
+          `${API_URL}/api/message/${selectedChat._id}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           },
@@ -219,7 +198,7 @@ function ChatPage() {
     }
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/api/message",
+        `${API_URL}/api/message`,
         {
           content: newMessage,
           chatId: selectedChat._id,
