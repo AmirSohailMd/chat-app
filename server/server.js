@@ -32,13 +32,22 @@ app.use(
   }),
 );
 
+const onLineUsers = new Map();
+
 io.on("connection", (socket) => {
   console.log("User connected: ", socket.id);
 
   socket.on("setup", (userData) => {
+    if (!userData?._id) return;
+
     socket.join(userData._id);
+    socket.userId = userData._id;
+    onLineUsers.set(userData._id, socket.id);
+
     socket.emit("connected");
-    console.log("User joined room: ", userData._id);
+
+    io.emit("online users updated", Array.from(onLineUsers.keys()));
+    console.log("User joined room & is ONLINE: ", userData._id);
   });
 
   socket.on("join chat", (room) => {
@@ -49,58 +58,34 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  // socket.on("new message", (newMessageReceived) => {
-  //   let chat = newMessageReceived.chat;
-
-  //   if (!chat.users) return;
-
-  //   chat.users.forEach((user) => {
-  //     const userId = user._id ? user._id.toString() : user.toString();
-
-  //     if (userId === newMessageReceived.sender._id.toString()) return;
-
-  //     console.log("Sending message to:", userId); // DEBUG
-
-  //     socket.to(userId).emit("message received", newMessageReceived);
-  //   });
-  // });
-
-  // socket.on("new message", (newMessageReceived) => {
-  //   console.log("🔥 NEW MESSAGE EVENT RECEIVED");
-  //   let chat = newMessageReceived.chat;
-
-  //   if (!chat || !chat.users) return console.log("Chat users not defined");
-
-  //   chat.users.forEach((user) => {
-  //     const userId = user._id ? user._id.toString() : user.toString();
-
-  //     // Ensure sender exists before checking ID
-  //     const senderId = newMessageReceived.sender?._id?.toString();
-
-  //     if (userId === senderId) return;
-
-  //     console.log("📤 Emitting to user:", userId);
-
-  //     //socket.to(userId).emit("message received", newMessageReceived);
-
-  //     socket
-  //       .to(chat._id.toString())
-  //       .emit("message received", newMessageReceived);
-  //   });
-  // });
-
   socket.on("new message", (newMessageReceived) => {
     console.log("🔥 NEW MESSAGE EVENT RECEIVED");
 
     let chat = newMessageReceived.chat;
 
-    if (!chat || !chat._id) {
+    if (!chat || !chat.users) {
       return console.log("❌ Chat not defined");
     }
 
-    console.log("📤 Emitting to chat room:", chat._id.toString());
+    chat.users.forEach((u) => {
+      const userId = u._id ? u._id.toString() : u.toString();
+      const senderId = newMessageReceived.sender?._id?.toString();
 
-    socket.to(chat._id.toString()).emit("message received", newMessageReceived);
+      if (userId === senderId) return;
+
+      socket.to(userId).emit("message received", newMessageReceived);
+    });
+
+    console.log("📤 Emitting to chat room:", chat._id.toString());
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+    if (socket.userId) {
+      onLineUsers.delete(socket.userId);
+
+      io.emit("online users updated", Array.from(onLineUsers.keys()));
+    }
   });
 
   // socket.off("setup", () => {

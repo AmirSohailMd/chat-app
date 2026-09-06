@@ -9,6 +9,9 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [socket, setSocket] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [chats, setChats] = useState([]);
+  const [onLineUsers, setOnLineUsers] = useState([]);
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -32,6 +35,10 @@ const ChatProvider = ({ children }) => {
       setSocketConnected(true);
     });
 
+    newSocket.on("online users updated", (users) => {
+      setOnLineUsers(users);
+    });
+
     setSocket(newSocket);
 
     return () => {
@@ -46,7 +53,18 @@ const ChatProvider = ({ children }) => {
 
   return (
     <ChatContext.Provider
-      value={{ user, setUser, socket, socketConnected, logout }}
+      value={{
+        user,
+        setUser,
+        socket,
+        socketConnected,
+        logout,
+        selectedChat,
+        setSelectedChat,
+        chats,
+        setChats,
+        onLineUsers,
+      }}
     >
       {children}
     </ChatContext.Provider>
