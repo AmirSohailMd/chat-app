@@ -29,22 +29,13 @@ const corsOptions = {
 
 const io = new Server(server, {
   pingTimeout: 60000,
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
 const cors = require("cors");
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  }),
-);
+app.use(cors(corsOptions));
 
 const onLineUsers = new Map();
 
