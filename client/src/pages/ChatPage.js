@@ -183,7 +183,10 @@ function ChatPage() {
   //fetch messages when selected chat changes
 
   useEffect(() => {
-    if (!selectedChat?._id || !socket || !user) return;
+    if (!selectedChat?._id || !socket || !user) {
+      setMessages([]);
+      return;
+    }
 
     socket.emit("join chat", selectedChat._id);
 
@@ -246,7 +249,8 @@ function ChatPage() {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
-        background: "#f1f5f9",
+        background: "#121417",
+        color: "#f1f5f9",
       }}
     >
       {/* 1. TOP NAVBAR */}
@@ -255,19 +259,39 @@ function ChatPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "12px 24px",
-          background: "#ffffff",
-          borderBottom: "1px solid #e2e8f0",
+          padding: "14px 28px",
+          background: "#1c1f26",
+          borderBottom: "1px solid #2e3440",
         }}
       >
-        <h2 style={{ color: "#4f46e5", margin: 0, fontSize: "20px" }}>
-          💬 ChatApp
-        </h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span
+            style={{
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+              backgroundColor: "#10b981",
+              boxShadow: "0 0 8px rgba(16, 185, 129, 0.6)",
+              display: "inline-block",
+            }}
+          ></span>
+          <h2
+            style={{
+              color: "#f8fafc",
+              margin: 0,
+              fontSize: "20px",
+              fontWeight: "800",
+              letterSpacing: "1px",
+            }}
+          >
+            PING
+          </h2>
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <div>
             <span style={{ color: "#10b981", marginRight: "6px" }}>●</span>
-            <strong>{user?.name}</strong>{" "}
-            <span style={{ fontSize: "12px", color: "#64748b" }}>
+            <strong style={{ color: "#f1f5f9" }}>{user?.name}</strong>{" "}
+            <span style={{ fontSize: "12px", color: "#94a3b8" }}>
               ({user?.email})
             </span>
           </div>
@@ -277,13 +301,14 @@ function ChatPage() {
               navigate("/");
             }}
             style={{
-              background: "#fee2e2",
-              color: "#dc2626",
-              border: "none",
+              background: "#2b1719",
+              color: "#f87171",
+              border: "1px solid #451a1d",
               padding: "6px 14px",
               borderRadius: "6px",
               cursor: "pointer",
               fontWeight: "600",
+              transition: "opacity 0.2s",
             }}
           >
             Logout
@@ -308,16 +333,16 @@ function ChatPage() {
         <div
           style={{
             width: "340px",
-            background: "#ffffff",
+            background: "#1c1f26",
             borderRadius: "12px",
-            border: "1px solid #e2e8f0",
+            border: "1px solid #2e3440",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
           }}
         >
           {/* Search Box */}
-          <div style={{ padding: "12px", borderBottom: "1px solid #e2e8f0" }}>
+          <div style={{ padding: "12px", borderBottom: "1px solid #262b35" }}>
             <input
               type="text"
               placeholder="🔍 Search users by name or email..."
@@ -325,31 +350,42 @@ function ChatPage() {
               onChange={(e) => handleSearch(e.target.value)}
               style={{
                 width: "100%",
-                padding: "8px 12px",
+                padding: "10px 14px",
+                background: "#15181e",
+                color: "#f1f5f9",
                 borderRadius: "8px",
-                border: "1.5px solid #e2e8f0",
+                border: "1px solid #2d333f",
                 outline: "none",
                 boxSizing: "border-box",
+                fontSize: "13px",
               }}
             />
           </div>
 
           {/* List Area */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
             {/* Search Results */}
             {search.trim() ? (
               <div>
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "#64748b",
-                    margin: "4px 8px 8px",
+                    fontWeight: "600",
+                    color: "#94a3b8",
+                    margin: "4px 6px 10px",
+                    letterSpacing: "0.5px",
                   }}
                 >
                   SEARCH RESULTS
                 </p>
                 {loadingSearch && (
-                  <p style={{ fontSize: "13px", padding: "8px" }}>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "#94a3b8",
+                      padding: "8px",
+                    }}
+                  >
                     Searching...
                   </p>
                 )}
@@ -357,7 +393,7 @@ function ChatPage() {
                   <p
                     style={{
                       fontSize: "13px",
-                      color: "#94a3b8",
+                      color: "#64748b",
                       padding: "8px",
                     }}
                   >
@@ -372,9 +408,10 @@ function ChatPage() {
                       padding: "10px 12px",
                       borderRadius: "8px",
                       cursor: "pointer",
-                      background: "#f8fafc",
+                      background: "#15181e",
                       marginBottom: "6px",
-                      border: "1px solid #e2e8f0",
+                      border: "1px solid #262b35",
+                      transition: "border-color 0.2s",
                     }}
                   >
                     <div
@@ -386,15 +423,20 @@ function ChatPage() {
                     >
                       <span
                         style={{
-                          color: isUserOnline(u._id) ? "#10b981" : "#94a3b8",
+                          color: isUserOnline(u._id) ? "#10b981" : "#64748b",
+                          fontSize: "12px",
                         }}
                       >
                         ●
                       </span>
-                      <strong>{u.name}</strong>
+                      <strong style={{ color: "#f1f5f9" }}>{u.name}</strong>
                     </div>
                     <p
-                      style={{ fontSize: "12px", color: "#64748b", margin: 0 }}
+                      style={{
+                        fontSize: "12px",
+                        color: "#94a3b8",
+                        margin: "3px 0 0",
+                      }}
                     >
                       {u.email}
                     </p>
@@ -407,8 +449,10 @@ function ChatPage() {
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "#64748b",
-                    margin: "4px 8px 8px",
+                    fontWeight: "600",
+                    color: "#94a3b8",
+                    margin: "4px 6px 10px",
+                    letterSpacing: "0.5px",
                   }}
                 >
                   RECENT CHATS
@@ -417,7 +461,7 @@ function ChatPage() {
                   <p
                     style={{
                       fontSize: "13px",
-                      color: "#94a3b8",
+                      color: "#64748b",
                       padding: "8px",
                     }}
                   >
@@ -436,11 +480,12 @@ function ChatPage() {
                         padding: "10px 12px",
                         borderRadius: "8px",
                         cursor: "pointer",
-                        background: isSelected ? "#e0e7ff" : "#f8fafc",
+                        background: isSelected ? "#282e38" : "#15181e",
                         marginBottom: "6px",
                         border: isSelected
-                          ? "1.5px solid #4f46e5"
-                          : "1px solid #e2e8f0",
+                          ? "1.5px solid #6366f1"
+                          : "1px solid #262b35",
+                        transition: "all 0.2s ease",
                       }}
                     >
                       <div
@@ -458,16 +503,21 @@ function ChatPage() {
                           }}
                         >
                           <span
-                            style={{ color: isOnline ? "#10b981" : "#94a3b8" }}
+                            style={{
+                              color: isOnline ? "#10b981" : "#64748b",
+                              fontSize: "12px",
+                            }}
                           >
                             ●
                           </span>
-                          <strong>{partner?.name || "Chat"}</strong>
+                          <strong style={{ color: "#f1f5f9" }}>
+                            {partner?.name || "Chat"}
+                          </strong>
                         </div>
                         <span
                           style={{
                             fontSize: "11px",
-                            color: isOnline ? "#10b981" : "#94a3b8",
+                            color: isOnline ? "#10b981" : "#64748b",
                             fontWeight: "600",
                           }}
                         >
@@ -478,7 +528,7 @@ function ChatPage() {
                         <p
                           style={{
                             fontSize: "12px",
-                            color: "#64748b",
+                            color: "#94a3b8",
                             margin: "4px 0 0",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -501,9 +551,9 @@ function ChatPage() {
         <div
           style={{
             flex: 1,
-            background: "#ffffff",
+            background: "#1c1f26",
             borderRadius: "12px",
-            border: "1px solid #e2e8f0",
+            border: "1px solid #2e3440",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
@@ -518,12 +568,12 @@ function ChatPage() {
                 return (
                   <div
                     style={{
-                      padding: "12px 20px",
-                      borderBottom: "1px solid #e2e8f0",
+                      padding: "14px 20px",
+                      borderBottom: "1px solid #262b35",
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      background: "#f8fafc",
+                      background: "#15181e",
                     }}
                   >
                     <div>
@@ -531,12 +581,13 @@ function ChatPage() {
                         style={{
                           margin: 0,
                           fontSize: "16px",
-                          color: "#1e293b",
+                          color: "#f8fafc",
+                          fontWeight: "700",
                         }}
                       >
                         {partner?.name || "Chat"}
                       </h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>
+                      <span style={{ fontSize: "12px", color: "#94a3b8" }}>
                         {partner?.email}
                       </span>
                     </div>
@@ -544,7 +595,7 @@ function ChatPage() {
                       style={{
                         fontSize: "13px",
                         fontWeight: "600",
-                        color: isOnline ? "#10b981" : "#94a3b8",
+                        color: isOnline ? "#10b981" : "#64748b",
                       }}
                     >
                       ● {isOnline ? "Online" : "Offline"}
@@ -564,44 +615,43 @@ function ChatPage() {
                   gap: "10px",
                 }}
               >
-                {messages.map((msg) => (
-                  <div
-                    key={msg._id}
-                    style={{
-                      display: "flex",
-                      justifyContent:
-                        msg.sender?._id === user?._id
-                          ? "flex-end"
-                          : "flex-start",
-                    }}
-                  >
+                {messages.map((msg) => {
+                  const isMine = msg.sender?._id === user?._id;
+                  return (
                     <div
+                      key={msg._id}
                       style={{
-                        maxWidth: "70%",
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        background:
-                          msg.sender?._id === user?._id ? "#4f46e5" : "#e2e8f0",
-                        color:
-                          msg.sender?._id === user?._id ? "#ffffff" : "#1e293b",
-                        wordBreak: "break-word",
+                        display: "flex",
+                        justifyContent: isMine ? "flex-end" : "flex-start",
                       }}
                     >
-                      <p
+                      <div
                         style={{
-                          fontSize: "11px",
-                          opacity: 0.8,
-                          margin: "0 0 2px",
+                          maxWidth: "70%",
+                          padding: "10px 14px",
+                          borderRadius: "12px",
+                          background: isMine ? "#4f46e5" : "#282e38",
+                          color: isMine ? "#ffffff" : "#f1f5f9",
+                          border: isMine ? "none" : "1px solid #333a48",
+                          wordBreak: "break-word",
                         }}
                       >
-                        {msg.sender?.name}
-                      </p>
-                      <p style={{ margin: 0, fontSize: "14px" }}>
-                        {msg.content}
-                      </p>
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            opacity: 0.8,
+                            margin: "0 0 2px",
+                          }}
+                        >
+                          {msg.sender?.name}
+                        </p>
+                        <p style={{ margin: 0, fontSize: "14px" }}>
+                          {msg.content}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div ref={bottomRef}></div>
               </div>
 
@@ -611,7 +661,7 @@ function ChatPage() {
                   style={{
                     padding: "4px 16px",
                     fontSize: "12px",
-                    color: "#64748b",
+                    color: "#94a3b8",
                     fontStyle: "italic",
                   }}
                 >
@@ -622,10 +672,11 @@ function ChatPage() {
               {/* Input Box */}
               <div
                 style={{
-                  padding: "12px 16px",
-                  borderTop: "1px solid #e2e8f0",
+                  padding: "14px 16px",
+                  borderTop: "1px solid #262b35",
                   display: "flex",
                   gap: "10px",
+                  background: "#15181e",
                 }}
               >
                 <input
@@ -653,9 +704,12 @@ function ChatPage() {
                   style={{
                     flex: 1,
                     padding: "10px 14px",
+                    background: "#1c1f26",
+                    color: "#f1f5f9",
                     borderRadius: "8px",
-                    border: "1.5px solid #e2e8f0",
+                    border: "1px solid #2d333f",
                     outline: "none",
+                    fontSize: "14px",
                   }}
                 />
                 <button
@@ -668,6 +722,7 @@ function ChatPage() {
                     borderRadius: "8px",
                     fontWeight: "600",
                     cursor: "pointer",
+                    transition: "background-color 0.2s",
                   }}
                 >
                   Send
@@ -683,11 +738,18 @@ function ChatPage() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#94a3b8",
+                color: "#64748b",
               }}
             >
-              <span style={{ fontSize: "48px", marginBottom: "12px" }}>👈</span>
-              <p style={{ fontSize: "16px", fontWeight: "500", margin: 0 }}>
+              <span style={{ fontSize: "48px", marginBottom: "12px" }}>💬</span>
+              <p
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "500",
+                  margin: 0,
+                  color: "#94a3b8",
+                }}
+              >
                 Select a conversation from the left or search for a user to
                 start chatting!
               </p>

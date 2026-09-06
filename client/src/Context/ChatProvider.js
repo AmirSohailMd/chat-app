@@ -49,7 +49,14 @@ const ChatProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("userInfo");
     setUser(null);
+    setSelectedChat(null);
+    setChats([]);
   };
+
+  useEffect(() => {
+    setSelectedChat(null);
+    setChats([]);
+  }, [user?._id]);
 
   return (
     <ChatContext.Provider

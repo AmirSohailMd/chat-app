@@ -34,6 +34,18 @@ const sendMessage = async (req, res) => {
 
 const fetchMessages = async (req, res) => {
   try {
+    const chat = await Chat.findOne({
+      _id: req.params.chatId,
+      users: { $elemMatch: { $eq: req.user._id } },
+    });
+
+    if (!chat) {
+      return res
+        .status(403)
+        .json({
+          message: "You are not authorized to view messages in this chat",
+        });
+    }
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "name email")
       .populate("chat", "_id users")

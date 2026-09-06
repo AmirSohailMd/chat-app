@@ -20,6 +20,11 @@ function Authpage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  //Password visibility toggles
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   //D.Hooks
 
   const navigate = useNavigate();
@@ -85,7 +90,7 @@ function Authpage() {
       return;
     }
 
-    if (password != confirmPassword) {
+    if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
     }
@@ -127,9 +132,13 @@ function Authpage() {
       <div className="auth-container">
         <div className="auth-card">
           {/*Header*/}
+          {/* Header */}
           <div className="auth-header">
-            <h1> Chat App</h1>
-            <p> Real-time messaging made simple</p>
+            <div className="brand-badge">
+              <span className="brand-dot"></span>
+              <h1>PING</h1>
+            </div>
+            <p>Real-time messaging made simple</p>
           </div>
 
           {/*Tab Switching Button*/}
@@ -173,19 +182,29 @@ function Authpage() {
               </div>
 
               <div className="form-group">
-                <label> Password</label>
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <label>Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? "👁️" : "🙈"}
+                  </button>
+                </div>
               </div>
 
               <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? "Loggin in.." : "Login"}
+                {loading ? "Logging in..." : "Login"}
               </button>
             </form>
           ) : (
@@ -217,27 +236,47 @@ function Authpage() {
               </div>
 
               <div className="form-group">
-                <label> Password</label>
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <label>Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? "👁️" : "🙈"}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
-                <label>Confrim Password</label>
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
+                <label>Confirm Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label="Toggle confirm password visibility"
+                  >
+                    {showConfirmPassword ? "👁️" : "🙈"}
+                  </button>
+                </div>
               </div>
 
               <button type="submit" className="submit-btn" disabled={loading}>
